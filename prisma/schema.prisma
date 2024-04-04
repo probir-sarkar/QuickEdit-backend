@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Contact {
-  id        String   @id @default(cuid())
+  id        Int      @id @default(autoincrement())
   firstName String
   lastName  String
   gender    Gender
@@ -25,7 +25,7 @@ model Contact {
 }
 
 model Address {
-  id        String  @id @default(cuid())
+  id        Int     @id @default(autoincrement())
   line1     String
   line2     String?
   city      String
@@ -33,7 +33,7 @@ model Address {
   country   String
   zipCode   String
   Contact   Contact @relation(fields: [contactId], references: [id])
-  contactId String  @unique
+  contactId Int     @unique
 
   @@map("addresses")
 }
