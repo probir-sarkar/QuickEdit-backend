@@ -16,7 +16,7 @@ const createContactSchema = z.object({
   firstName: z.string().min(3).max(14),
   lastName: z.string().min(3).max(14),
   email: z.string().email(),
-  phone: z.string().min(6).max(14),
+  phone: z.string().min(6).max(18),
   gender: z.enum(["MALE", "FEMALE", "OTHER"]),
   other: z.object({}).optional(),
   address: z.object({
@@ -31,8 +31,6 @@ const createContactSchema = z.object({
 
 export const createContact: RequestHandler = async (req, res) => {
   try {
-    console.log(req.body);
-    
     const { address, ...contactData } = createContactSchema.parse(req.body);
     const exisingContact = await prisma.contact.findUnique({
       where: {
@@ -111,6 +109,68 @@ export const deleteContact: RequestHandler = async (req, res) => {
       return res.status(200).json({ message: "Contact deleted successfully" });
     }
     return res.status(500).json({ message: "Failed to delete contact" });
+  } catch (error) {
+    console.log(error);
+    
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+const contactSchema = z.object({
+  id: z.number().optional(),
+  firstName: z.string().min(3).max(14).optional(),
+  lastName: z.string().min(3).max(14).optional(),
+  email: z.string().email().optional(),
+  phone: z.string().min(6).max(18).optional(),
+  gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
+});
+
+
+export const updateContactField: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if(!id || isNaN(parseInt(id))) return res.status(400).json({ message: "Invalid contact id" });
+    const contactData = contactSchema.parse(req.body);
+    if(Object.keys(contactData).length === 0) return res.status(400).json({ message: "No fields to update" });
+    const contact = await prisma.contact.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        ...contactData,
+      },
+    });
+    if (contact) {
+      return res.status(200).json(contact);
+    }
+    return res.status(500).json({ message: "Failed to update contact" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ message: "Invalid data", errors: formatZodErrors(error)});
+    }
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
+export const getContact: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if(!id || isNaN(parseInt(id))) return res.status(400).json({ message: "Invalid contact id" });
+    const contact = await prisma.contact.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+      include:{
+        address:true
+      }
+    }); 
+    if (contact) {
+      return res.status(200).json({
+        contact,
+      });
+    }
+    return res.status(404).json({ message: "Contact not found" });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }

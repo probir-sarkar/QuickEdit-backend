@@ -32,7 +32,7 @@ model Address {
   state     String
   country   String
   zipCode   String
-  Contact   Contact @relation(fields: [contactId], references: [id])
+  Contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
   contactId Int     @unique
 
   @@map("addresses")
