@@ -1,4 +1,4 @@
 name = "zix-api"
-main = "src/app.ts"
+main = "src/worker.js"
 compatibility_date = "2024-04-08"
 workers_dev = true
