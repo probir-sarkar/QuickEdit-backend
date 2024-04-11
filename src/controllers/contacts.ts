@@ -1,10 +1,9 @@
-import { RequestHandler } from "express";
 import prismaGenerate from "@/configs/prisma";
 import z from "zod";
 import { formatZodErrors } from "@/utils";
 import { createContactSchema, contactSchema } from "@/schemas/contacts.schema";
 import { Handler } from "hono";
-import { env, getRuntimeKey } from "hono/adapter";
+import { env } from "hono/adapter";
 
 export const getContacts: Handler = async (c) => {
 	try {
@@ -14,9 +13,7 @@ export const getContacts: Handler = async (c) => {
 		return c.json(contacts);
 	} catch (error) {
 		console.log(error);
-
-		c.status(500);
-		c.json({ message: "Internal server error" });
+		c.json({ message: "Internal server error" }, 500);
 	}
 };
 
@@ -35,8 +32,7 @@ export const createContact: Handler = async (c) => {
 			},
 		});
 		if (exisingContact) {
-			c.status(400);
-			return c.json({ message: "Contact already exists" });
+			return c.json({ message: "Contact already exists" }, 400);
 		}
 
 		const contact = await prisma.contact.create({

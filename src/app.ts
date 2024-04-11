@@ -8,7 +8,6 @@ import {
 	deleteContact,
 	getContact,
 } from "@/controllers/contacts";
-import { errorHandler } from "@/middlewares/errorHandler";
 
 const app = new Hono();
 
@@ -25,11 +24,9 @@ app
 	.put(updateContactField);
 
 // Route not found handler, must be the last route and before the global error handler, It will handle all routes that are not found
-app.all("*", async (c) => {
-	c.status(404);
-	c.json({ message: "Route not found" });
+app.onError((err, c) => {
+	console.error(`${err}`);
+	return c.text("Something went wrong!", 500);
 });
 
-// Global error handler, must be the last middleware, It will handle all errors
-// app.use(errorHandler);
 export default app;
