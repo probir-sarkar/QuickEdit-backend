@@ -1,14 +1,17 @@
 import { RequestHandler } from "express";
-import prisma from "@/configs/prisma";
+import prismaGenerate from "@/configs/prisma";
 import z from "zod";
 import { formatZodErrors } from "@/utils";
 import { createContactSchema, contactSchema } from "@/schemas/contacts.schema";
 import { Handler } from "hono";
+import { env, getRuntimeKey } from "hono/adapter";
 
 export const getContacts: Handler = async (c) => {
 	try {
+		const { DATABASE_URL } = env<{ DATABASE_URL: string }>(c);
+		const prisma = prismaGenerate(DATABASE_URL);
 		const contacts = await prisma.contact.findMany();
-		return c.json({ message: "Hello World" });
+		return c.json(contacts);
 	} catch (error) {
 		console.log(error);
 
@@ -19,7 +22,10 @@ export const getContacts: Handler = async (c) => {
 
 export const createContact: Handler = async (c) => {
 	try {
-		const { address, ...contactData } = createContactSchema.parse(c.body);
+		const { DATABASE_URL } = env<{ DATABASE_URL: string }>(c);
+		const prisma = prismaGenerate(DATABASE_URL);
+		const body = await c.req.json();
+		const { address, ...contactData } = createContactSchema.parse(body);
 		const exisingContact = await prisma.contact.findUnique({
 			where: {
 				email_phone: {
@@ -63,12 +69,15 @@ export const createContact: Handler = async (c) => {
 
 export const updateContact: Handler = async (c) => {
 	try {
+		const { DATABASE_URL } = env<{ DATABASE_URL: string }>(c);
+		const prisma = prismaGenerate(DATABASE_URL);
 		const id = c.req.param("id");
 		if (!id || isNaN(parseInt(id))) {
 			c.status(400);
 			return c.json({ message: "Invalid contact id" });
 		}
-		const { address, ...contactData } = createContactSchema.parse(c.body);
+		const body = await c.req.json();
+		const { address, ...contactData } = createContactSchema.parse(body);
 		const contact = await prisma.contact.update({
 			where: {
 				id: parseInt(id),
@@ -102,6 +111,8 @@ export const updateContact: Handler = async (c) => {
 
 export const deleteContact: Handler = async (c) => {
 	try {
+		const { DATABASE_URL } = env<{ DATABASE_URL: string }>(c);
+		const prisma = prismaGenerate(DATABASE_URL);
 		const id = c.req.param("id");
 		if (!id || isNaN(parseInt(id))) {
 			c.status(400);
@@ -126,12 +137,15 @@ export const deleteContact: Handler = async (c) => {
 
 export const updateContactField: Handler = async (c) => {
 	try {
+		const { DATABASE_URL } = env<{ DATABASE_URL: string }>(c);
+		const prisma = prismaGenerate(DATABASE_URL);
 		const id = c.req.param("id");
 		if (!id || isNaN(parseInt(id))) {
 			c.status(400);
 			return c.json({ message: "Invalid contact id" });
 		}
-		const contactData = contactSchema.parse(c.body);
+		const body = await c.req.json();
+		const contactData = contactSchema.parse(body);
 		if (Object.keys(contactData).length === 0) {
 			c.status(400);
 			return c.json({ message: "No data provided" });
@@ -164,6 +178,8 @@ export const updateContactField: Handler = async (c) => {
 
 export const getContact: Handler = async (c) => {
 	try {
+		const { DATABASE_URL } = env<{ DATABASE_URL: string }>(c);
+		const prisma = prismaGenerate(DATABASE_URL);
 		const id = c.req.param("id");
 		if (!id || isNaN(parseInt(id))) {
 			c.status(400);
