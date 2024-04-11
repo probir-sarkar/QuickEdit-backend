@@ -86,6 +86,9 @@ export const updateContact: Handler = async (c) => {
 					},
 				},
 			},
+			include: {
+				address: true,
+			},
 		});
 		if (contact) {
 			return c.json(contact);
@@ -114,20 +117,26 @@ export const deleteContact: Handler = async (c) => {
 			c.status(400);
 			return c.json({ message: "Invalid contact id" });
 		}
-		const contact = await prisma.contact.delete({
+		const contact = await prisma.contact.findUnique({
 			where: {
 				id: parseInt(id),
 			},
 		});
-		if (contact) {
-			return c.json(contact);
+		if (!contact) {
+			c.status(404);
+			return c.json({ message: "Contact not found" });
 		}
-		c.status(500);
-		return c.json({ message: "Failed to delete contact" });
+		await prisma.contact.delete({
+			where: {
+				id: parseInt(id),
+			},
+		});
+		return c.json({
+			message: "Contact deleted successfully",
+		});
 	} catch (error) {
 		console.log(error);
-		c.status(500);
-		return c.json({ message: "Internal server error" });
+		return c.json({ message: "Failed to delete contact" }, 500);
 	}
 };
 

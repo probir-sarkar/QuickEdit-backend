@@ -1,5 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { jsxRenderer, useRequestContext } from "hono/jsx-renderer";
+import getHome from "@/views/home";
 
 import {
 	getContacts,
@@ -7,13 +9,13 @@ import {
 	updateContactField,
 	deleteContact,
 	getContact,
+	updateContact,
 } from "@/controllers/contacts";
 
 const app = new Hono();
 
 app.use(cors());
-
-app.get("/", (c) => c.text("Hello World"));
+app.get("/", getHome);
 
 app.route("/contacts").get(getContacts).post(createContact);
 app
@@ -21,7 +23,7 @@ app
 	.patch(updateContactField)
 	.delete(deleteContact)
 	.get(getContact)
-	.put(updateContactField);
+	.put(updateContact);
 
 // Route not found handler, must be the last route and before the global error handler, It will handle all routes that are not found
 app.onError((err, c) => {

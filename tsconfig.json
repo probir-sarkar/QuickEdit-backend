@@ -1,14 +1,16 @@
 {
-  "compilerOptions": {
-    "target": "ES6",
-    "module": "commonjs",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "esModuleInterop": true,
-    "strictNullChecks": true,
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "commonjs",
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"esModuleInterop": true,
+		"strictNullChecks": true,
+		"jsx": "react-jsx",
+		"jsxImportSource": "hono/jsx",
 
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	}
 }
