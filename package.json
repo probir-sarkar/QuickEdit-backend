@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --exec node -r esbuild-register src/app.ts",
     "build": "tsc && tsc-alias",
-    "start": "node dist/app.js"
+    "start": "node dist/app.js",
+    "build:clean": "npm run build && npm prune --production && rm -rf src"
   },
   "author": "",
   "license": "ISC",
