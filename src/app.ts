@@ -13,7 +13,7 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => res.send("Hello World"));
+app.get("/", (req, res) => res.send("Hello World from QuickEdit"));
 
 app.route("/contacts").get(getContacts).post(createContact);
 app.route("/contacts/:id").patch(updateContactField).delete(deleteContact).get(getContact).put(updateContactField);
