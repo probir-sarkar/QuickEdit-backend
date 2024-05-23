@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag quickedit-backend:latest
+      run: docker build . --file Dockerfile --tag probirsarkar99/quickedit-backend:latest
     - name: Push the Docker image
       run: |
        docker login -u probirsarkar99 -p ${{ secrets.DOCKER_HUB_TOKEN }}
